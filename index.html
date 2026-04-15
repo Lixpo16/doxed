@@ -1,0 +1,262 @@
+
+<style>
+  @keyframes shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  @keyframes float-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spark {
+    0%   { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)) scale(0); opacity: 0; }
+  }
+  .lixpo-logo {
+    font-size: 42px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, #7F77DD 0%, #AFA9EC 30%, #fff 50%, #AFA9EC 70%, #7F77DD 100%);
+    background-size: 400px 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2.2s linear infinite;
+  }
+  .spark {
+    position: absolute;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #AFA9EC;
+    animation: spark 1s ease-out forwards;
+    pointer-events: none;
+  }
+  .pill-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    font-size: 13px; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .pill-btn:hover { background: var(--color-background-tertiary); border-color: var(--color-border-primary); }
+  .pill-btn.active {
+    background: #7F77DD22;
+    border-color: #7F77DD;
+    color: #7F77DD;
+  }
+  .go-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--border-radius-lg);
+    border: none;
+    background: #7F77DD;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .go-btn:hover { background: #534AB7; }
+  .go-btn:active { transform: scale(0.98); }
+  .url-input {
+    width: 100%; box-sizing: border-box;
+    padding: 12px 16px;
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .url-input:focus { border-color: #7F77DD; }
+  .category-tab {
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--color-border-tertiary);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 13px; cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .category-tab.active {
+    background: #7F77DD;
+    border-color: #7F77DD;
+    color: #fff;
+  }
+  .site-card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-primary);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    animation: float-in 0.4s ease both;
+    text-decoration: none; color: var(--color-text-primary);
+  }
+  .site-card:hover { border-color: #7F77DD; background: #7F77DD0d; }
+  .site-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  #spark-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+</style>
+
+<div style="position:relative; padding: 2rem 1.25rem 1.5rem; max-width: 520px; margin: 0 auto; animation: float-in 0.5s ease;">
+  <div id="spark-container"></div>
+
+  <div style="text-align:center; margin-bottom: 1.8rem;">
+    <div id="logo" class="lixpo-logo" style="cursor:default; user-select:none;">LIXPO</div>
+    <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; letter-spacing: 0.5px;">Holy Unblocker ile özgürce gezin</div>
+  </div>
+
+  <div style="margin-bottom: 1.2rem;">
+    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+      <input id="urlInput" class="url-input" type="text" placeholder="URL veya arama terimi girin..." />
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+      <button class="pill-btn active" id="btn-google" onclick="setEngine('google',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#7F77DD" stroke-width="1.5"/><path d="M12 8v8M8 12h8" stroke="#7F77DD" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Google
+      </button>
+      <button class="pill-btn" id="btn-bing" onclick="setEngine('bing',this)">Bing</button>
+      <button class="pill-btn" id="btn-duck" onclick="setEngine('duck',this)">DuckDuckGo</button>
+      <button class="pill-btn" id="btn-youtube" onclick="setEngine('youtube',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#AFA9EC"><path d="M21.8 8s-.2-1.4-.8-2c-.8-.8-1.6-.8-2-.9C16.8 5 12 5 12 5s-4.8 0-7 .1c-.4.1-1.2.1-2 .9-.6.6-.8 2-.8 2S2 9.6 2 11.2v1.5c0 1.6.2 3.2.2 3.2s.2 1.4.8 2c.8.8 1.8.8 2.2.8C6.8 19 12 19 12 19s4.8 0 7-.1c.4-.1 1.2-.1 2-.9.6-.6.8-2 .8-2s.2-1.6.2-3.2v-1.5C22 9.6 21.8 8 21.8 8z"/><polygon points="10,15 15,12 10,9" fill="white"/></svg>
+        YouTube
+      </button>
+      <button class="pill-btn" id="btn-twitch" onclick="setEngine('twitch',this)">Twitch</button>
+    </div>
+    <button class="go-btn" onclick="goUnblock()">GİT →</button>
+  </div>
+
+  <div style="margin-top: 1.6rem;">
+    <div style="font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase;">Kategoriler</div>
+    <div id="cat-tabs" style="display:flex; gap: 8px; flex-wrap:wrap; margin-bottom: 12px;">
+      <button class="category-tab active" onclick="filterCat('all',this)">Tümü</button>
+      <button class="category-tab" onclick="filterCat('sosyal',this)">Sosyal</button>
+      <button class="category-tab" onclick="filterCat('oyun',this)">Oyun</button>
+      <button class="category-tab" onclick="filterCat('video',this)">Video</button>
+      <button class="category-tab" onclick="filterCat('haber',this)">Haber</button>
+      <button class="category-tab" onclick="filterCat('muzik',this)">Müzik</button>
+    </div>
+    <div id="site-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+  </div>
+
+  <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); text-align:center;">
+    <span style="font-size: 12px; color: var(--color-text-tertiary);">Holy Unblocker üzerinden erişim sağlanmaktadır</span>
+  </div>
+</div>
+
+<script>
+const sites = [
+  { name: "Instagram", icon: "📸", cat: "sosyal", url: "https://instagram.com" },
+  { name: "Twitter/X", icon: "🐦", cat: "sosyal", url: "https://x.com" },
+  { name: "TikTok", icon: "🎵", cat: "sosyal", url: "https://tiktok.com" },
+  { name: "Discord", icon: "💬", cat: "sosyal", url: "https://discord.com" },
+  { name: "YouTube", icon: "▶", cat: "video", url: "https://youtube.com" },
+  { name: "Twitch", icon: "🎮", cat: "video", url: "https://twitch.tv" },
+  { name: "Netflix", icon: "🎬", cat: "video", url: "https://netflix.com" },
+  { name: "Roblox", icon: "🟥", cat: "oyun", url: "https://roblox.com" },
+  { name: "Minecraft", icon: "⛏", cat: "oyun", url: "https://minecraft.net" },
+  { name: "Coolmath", icon: "🧮", cat: "oyun", url: "https://coolmathgames.com" },
+  { name: "Spotify", icon: "🎧", cat: "muzik", url: "https://spotify.com" },
+  { name: "SoundCloud", icon: "🔊", cat: "muzik", url: "https://soundcloud.com" },
+  { name: "BBC News", icon: "📰", cat: "haber", url: "https://bbc.com/news" },
+  { name: "Reddit", icon: "🟠", cat: "haber", url: "https://reddit.com" },
+];
+
+const engines = {
+  google: "https://www.google.com/search?q=",
+  bing: "https://www.bing.com/search?q=",
+  duck: "https://duckduckgo.com/?q=",
+  youtube: "https://www.youtube.com/results?search_query=",
+  twitch: "https://www.twitch.tv/search?term=",
+};
+let currentEngine = "google";
+let currentCat = "all";
+
+function setEngine(e, btn) {
+  currentEngine = e;
+  document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function filterCat(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.category-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSites();
+}
+
+function renderSites() {
+  const grid = document.getElementById('site-grid');
+  const filtered = currentCat === 'all' ? sites : sites.filter(s => s.cat === currentCat);
+  grid.innerHTML = '';
+  filtered.forEach((s, i) => {
+    const a = document.createElement('div');
+    a.className = 'site-card';
+    a.style.animationDelay = (i * 0.05) + 's';
+    a.innerHTML = `<div class="site-icon" style="background:#7F77DD18;">${s.icon}</div><span style="font-size:13px;">${s.name}</span>`;
+    a.onclick = () => openProxy(s.url);
+    grid.appendChild(a);
+  });
+}
+
+function goUnblock() {
+  const val = document.getElementById('urlInput').value.trim();
+  if (!val) return;
+  let target;
+  if (/^https?:\/\//.test(val) || /^[a-z0-9-]+\.[a-z]{2,}/i.test(val)) {
+    target = val.startsWith('http') ? val : 'https://' + val;
+  } else {
+    target = engines[currentEngine] + encodeURIComponent(val);
+  }
+  openProxy(target);
+}
+
+function openProxy(url) {
+  const encoded = encodeURIComponent(url);
+  const proxyUrl = "https://holy-unblocker.pages.dev/go#" + encoded;
+  spawnSparks();
+  window.open(proxyUrl, '_blank');
+}
+
+function spawnSparks() {
+  const logo = document.getElementById('logo');
+  const rect = logo.getBoundingClientRect();
+  const container = document.getElementById('spark-container');
+  for (let i = 0; i < 12; i++) {
+    const sp = document.createElement('div');
+    sp.className = 'spark';
+    const angle = (i / 12) * Math.PI * 2;
+    const dist = 40 + Math.random() * 40;
+    sp.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+    sp.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+    sp.style.left = (rect.left + rect.width / 2 - container.getBoundingClientRect().left) + 'px';
+    sp.style.top = (rect.top + rect.height / 2 - container.getBoundingClientRect().top) + 'px';
+    sp.style.animationDelay = (Math.random() * 0.2) + 's';
+    container.appendChild(sp);
+    setTimeout(() => sp.remove(), 1200);
+  }
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') goUnblock();
+});
+
+document.getElementById('logo').addEventListener('click', spawnSparks);
+
+renderSites();
+</script>
